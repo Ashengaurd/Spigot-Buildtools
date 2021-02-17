@@ -1,3 +1,6 @@
 # Project exclude paths
 /build/
 /dist/
+.idea/
+/main.spec
+/tools.zip
