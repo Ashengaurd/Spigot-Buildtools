@@ -1,6 +1,7 @@
 import logging
 import os
 import re
+from sys import platform
 from datetime import datetime
 from queue import Queue
 from subprocess import Popen, PIPE
@@ -8,6 +9,26 @@ from threading import Thread
 from time import sleep
 from typing import List
 from zipfile import ZipFile
+
+# Default to Windows
+runnable_extension = "bat"
+remove_directory_cmd = 'RD /s /q "%path%"\n'
+remove_file_cmd = 'DEL /q "%path%"\n'
+
+# linux
+if platform == "linux" or platform == "linux2":
+    runnable_extension = "sh"
+    remove_directory_cmd = 'rm -r "%path%"\n'
+    remove_file_cmd = 'rm "%path%"\n'
+# mac
+elif platform == "darwin":
+    runnable_extension = "sh"
+    remove_directory_cmd = 'rm -r "%path%"\n'
+    remove_file_cmd = 'rm "%path%"\n'
+# windows
+elif platform == "win32":
+    # do nothing because Windows is the default
+    pass
 
 CONSOLE = 15
 logging.addLevelName(CONSOLE, "CONSOLE")
@@ -91,21 +112,22 @@ class Version:
 
     def save_batch(self):
         os.makedirs(self.path, exist_ok=True)
-        with open(f'{self.path}/Installer.bat', 'w', encoding='utf8') as f:
+        with open(f'{self.path}/Installer.{runnable_extension}', 'w', encoding='utf8') as f:
             f.write('@echo off\n')
             f.write(self.command)
             if self.craftbukkit and self._minor > 13:
                 f.write(f'\n{self.command} --compile craftbukkit')
 
         from main import TOOLS
-        with open(f'{self.path}/Cleaner.bat', 'w', encoding='utf8') as f:
+        with open(f'{self.path}/Cleaner.{runnable_extension}', 'w', encoding='utf8') as f:
             f.write('@echo off\n')
             for file in TOOLS:
                 path = f'{self.path}/{file}'.replace('/', '\\')
+                # TODO: change per OS
                 if os.path.isdir(path):
-                    f.write(f'RD /s /q "{path}"\n')
+                    f.write(remove_directory_cmd.replace("%path%", path))
                 else:
-                    f.write(f'DEL /q "{path}"\n')
+                    f.write(remove_file_cmd.replace("%path%", path))
 
     def extract_tools(self):
         os.makedirs(self.path, exist_ok=True)
@@ -115,12 +137,12 @@ class Version:
         self._cache = os.listdir(self.path)
 
     def run_batch(self, logger: logging.Logger):
-        BatchExecutor('Installer.bat', self.path, logger).run()
+        BatchExecutor(f'Installer.{runnable_extension}', self.path, logger).run()
 
     def clear_tools(self, logger: logging.Logger):
-        BatchExecutor('Cleaner.bat', self.path, logger).run()
-        os.remove(f'{self.path}/Installer.bat')
-        os.remove(f'{self.path}/Cleaner.bat')
+        BatchExecutor(f'Cleaner.{runnable_extension}', self.path, logger).run()
+        os.remove(f'{self.path}/Installer.{runnable_extension}')
+        os.remove(f'{self.path}/Cleaner.{runnable_extension}')
 
 
 class Worker:
