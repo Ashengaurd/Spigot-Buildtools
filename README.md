@@ -14,7 +14,7 @@ This is not sth different than the official build tools, It just runs the "Build
    * Per worker Log
    * Cache Cleaner
 
-![Screenshot](http://prntscr.com/zvh2yv)
+![Screenshot](https://media.discordapp.net/attachments/717841934856749089/811641531727347722/index.png)
 
 ## The tutorial
 
@@ -25,7 +25,8 @@ This is not sth different than the official build tools, It just runs the "Build
     When a worker finishes the build it will clean most of the cache and report it back and look for a new version.
 
 ## Download
-The download is available on Mega.nz at the following link:
-
-The source code is available at my github at:
-https://github.com/Ashengaurd/Spigot-Buildtools
+The download is available on Mega.nz at the following link:  
+https://mega.nz/folder/1Vgm1YiS#CMv3drGKM6MzRFqVkMIW9g  
+  
+The source code is available at my github at:  
+https://github.com/Ashengaurd/Spigot-Buildtools  
